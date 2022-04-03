@@ -1,0 +1,19 @@
+body:
+  - type: textBlock
+    attributes:
+      name: description
+      description: >
+        Please install the Bitwarden CLI at https://bitwarden.com/help/cli/ and get your session key by running the following command:
+
+
+        bw unlock
+        
+
+        Provide your Bitwarden session key in the fields below.
+
+  - type: passwordBox
+    attributes:
+      name: bw_session
+      label: 'Session key:'
+      defaultValue: ""
+      description: Bitwarden-cli session key
