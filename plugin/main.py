@@ -5,7 +5,7 @@ import subprocess, json, os
 import favicon, validators, webbrowser
 import pathlib, tempfile
 import urllib.request
-from requests.exceptions import HTTPError, SSLError
+from requests.exceptions import HTTPError, SSLError, ConnectionError
 from urllib.error import HTTPError as URLError
 
 
@@ -66,12 +66,14 @@ class Bitwarden(Flox, Clipboard):
                             urls = [uriItem['uri'] for uriItem in item['login']['uris'] if validators.url(uriItem['uri'])]
 
                         if len(urls) != 0:
-                            iconPath = TMPDIR / f'{item["name"]}.png'
+
+                            fileName = ''.join(e for e in item["name"] if e.isalnum())
+                            iconPath = TMPDIR / f'{fileName}.png'
                             if not os.path.exists(iconPath):
                                 try:
                                     icon = favicon.get(urls[0])[0]
                                     urllib.request.urlretrieve(icon.url, iconPath)
-                                except (HTTPError, SSLError, URLError, IndexError) as e:
+                                except (HTTPError, SSLError, URLError, IndexError,ConnectionError) as e:
                                     iconPath = DEFAULT_ICON
                         else:
                             iconPath = DEFAULT_ICON
