@@ -1,0 +1,12 @@
+{
+    "ID":"007b18a1-f05d-40be-82e9-4411c9aa5ee8",             
+    "ActionKeyword":"bw",
+    "Name":"Bitwarden",
+    "Description":"Get passwords from Bitwarden from Flow Launcher",
+    "Author":"watermarkhu",
+    "Version":"0.1.0",  
+    "Language":"python",
+    "Website":"https://github.com/watermarkhu/FlowLauncherBitwarden",
+    "IcoPath": "icons\\bitwarden256x256.png",
+    "ExecuteFileName":"main.py"
+  }
