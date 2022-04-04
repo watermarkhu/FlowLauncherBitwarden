@@ -36,6 +36,12 @@ class Bitwarden(Flox, Clipboard):
             startupinfo.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
             startupinfo.wShowWindow = subprocess.SW_HIDE
 
+            if query == 'sync':
+                subprocess.run('bw sync'.split(), env=my_env, startupinfo = startupinfo)
+                self.add_item(
+                        title='Sync completed'
+                    )
+
             try:
                 output = subprocess.run(f'bw list items --search {query}'.split(), capture_output=True, env=my_env, startupinfo = startupinfo)
                 outputStr = output.stdout.decode('UTF-8')
@@ -47,38 +53,43 @@ class Bitwarden(Flox, Clipboard):
             else:
                 outputDict = [item for item in outputDict if 'login' in item.keys()]
 
-                for i in range(len(outputDict)):
-                    
-                    item = outputDict[i]
-
-                    if type(item['login']['uris']) is list:
-                        urls = [uriItem['uri'] for uriItem in item['login']['uris'] if validators.url(uriItem['uri'])]
-
-                    if len(urls) != 0:
-                        iconPath = TMPDIR / f'{item["name"]}.png'
-                        if not os.path.exists(iconPath):
-                            try:
-                                icon = favicon.get(urls[0])[0]
-                                urllib.request.urlretrieve(icon.url, iconPath)
-                            except (HTTPError, SSLError, URLError, IndexError) as e:
-                                iconPath = DEFAULT_ICON
-                    else:
-                        iconPath = DEFAULT_ICON
-                            
+                if len(outputDict) == 0:
                     self.add_item(
-                        title=item['name'],
-                        subtitle=item['login']['username'],
-                        icon=iconPath,
-                        method=self.type_char,
-                        parameters=[item['login']['password']],
-                        context = [
-                            item['login']['username'],
-                            item['login']['password'], 
-                            item['login']['totp'],
-                            urls,
-                            str(iconPath)
-                        ]
+                        title='No entries found'
                     )
+                else:
+                    for i in range(len(outputDict)):
+                        
+                        item = outputDict[i]
+
+                        if type(item['login']['uris']) is list:
+                            urls = [uriItem['uri'] for uriItem in item['login']['uris'] if validators.url(uriItem['uri'])]
+
+                        if len(urls) != 0:
+                            iconPath = TMPDIR / f'{item["name"]}.png'
+                            if not os.path.exists(iconPath):
+                                try:
+                                    icon = favicon.get(urls[0])[0]
+                                    urllib.request.urlretrieve(icon.url, iconPath)
+                                except (HTTPError, SSLError, URLError, IndexError) as e:
+                                    iconPath = DEFAULT_ICON
+                        else:
+                            iconPath = DEFAULT_ICON
+                                
+                        self.add_item(
+                            title=item['name'],
+                            subtitle=item['login']['username'],
+                            icon=iconPath,
+                            method=self.type_char,
+                            parameters=[item['login']['password']],
+                            context = [
+                                item['login']['username'],
+                                item['login']['password'], 
+                                item['login']['totp'],
+                                urls,
+                                str(iconPath)
+                            ]
+                        )
 
     def type_char(self, char):
         """
