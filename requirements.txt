@@ -1,0 +1,5 @@
+
+git+https://github.com/garulf/flox@v0.10.4#egg=flox-lib
+requests==2.25.1
+favicon>=0.7.0
+validators>= 0.18.2

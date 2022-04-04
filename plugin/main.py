@@ -2,21 +2,17 @@
 from flox import Flox
 from flox.clipboard import Clipboard 
 import subprocess, json, os
-import favicon, validators
-from pathlib import Path
-from subprocess import Popen
-import webbrowser
-import pathlib
-import tempfile
+import favicon, validators, webbrowser
+import pathlib, tempfile
 import urllib.request
 from requests.exceptions import HTTPError, SSLError
 from urllib.error import HTTPError as URLError
 
 
-
 NO_WINDOW = 0x08000000
 TMPDIR = pathlib.Path(tempfile.gettempdir())
 DEFAULT_ICON = pathlib.Path(__file__).parent.parent.absolute() / 'icons' / 'bitwarden256x256.png'
+
 
 # have your class inherit from Flox
 class Bitwarden(Flox, Clipboard):
@@ -88,13 +84,13 @@ class Bitwarden(Flox, Clipboard):
         """
         Type a character into the current focused window.
         """
-        script_path = Path(__file__).parent.resolve() / "sendkeys.py"
+        script_path = pathlib.Path(__file__).parent.resolve() / "sendkeys.py"
         self.put(char)
         python_path = 'pythonw.exe'
-        python_setting = Path(self.app_settings["PluginSettings"].get("PythonDirectory"))
+        python_setting = pathlib.Path(self.app_settings["PluginSettings"].get("PythonDirectory"))
         if python_setting:
-            python_path = Path(python_setting, "python.exe")
-        Popen([python_path, script_path], creationflags=NO_WINDOW)
+            python_path = pathlib.Path(python_setting, "python.exe")
+        subprocess.Popen([python_path, script_path], creationflags=NO_WINDOW)
         self.close_app()
 
     def open_url(self, url):
