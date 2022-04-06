@@ -88,6 +88,7 @@ class Bitwarden(Flox, Clipboard):
                                 item['login']['username'],
                                 item['login']['password'], 
                                 item['login']['totp'],
+                                item.get('fields', []),
                                 urls,
                                 str(iconPath)
                             ]
@@ -112,31 +113,49 @@ class Bitwarden(Flox, Clipboard):
 
     def context_menu(self, data):
         self.add_item(
-            title='Insert and copy username',
+            title='Username',
             subtitle=data[0],
-            icon=data[4],
+            icon=data[5],
             method=self.type_char,
             parameters=[data[0]]
         )
         self.add_item(
-            title='Insert and copy password',
+            title='Password',
+            subtitle='Hidden',
             method=self.type_char,
-            icon=data[4],
+            icon=data[5],
             parameters=[data[1]]
         )
         if data[2] != None:
             self.add_item(
-                title='Insert and copy TOTP',
+                title='TOTP',
                 subtitle=data[2],
-                icon=data[4],
+                icon=data[5],
                 method=self.type_char,
                 parameters=[data[2]]
             )
-        for url in data[3]:
+        for field in data[3]:
+            if field['type'] == 1:
+                self.add_item(
+                    title=field['name'],
+                    subtitle='Hidden',
+                    icon=data[5],
+                    method=self.type_char,
+                    parameters=[field['value']]
+                )
+            else:
+                self.add_item(
+                    title=field['name'],
+                    subtitle=field['value'],
+                    icon=data[5],
+                    method=self.type_char,
+                    parameters=[field['value']]
+                )
+        for url in data[4]:
             self.add_item(
-                title='Open URL in browser',
+                title='Open in browser',
                 subtitle=url,
-                icon=data[4],
+                icon=data[5],
                 method=self.open_url,
                 parameters=[url]
             )
