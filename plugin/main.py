@@ -30,7 +30,7 @@ class Bitwarden(Flox, Clipboard):
 
         if self.settings['executable']:
             path = pathlib.Path(self.settings['executable'].encode('unicode_escape'))
-            command = path if path.exists() else 'bw'
+            command = path if path.exists() else self.settings['executable']
         else:
             command = 'bw'
         

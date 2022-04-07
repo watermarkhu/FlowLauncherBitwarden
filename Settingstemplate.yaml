@@ -22,5 +22,5 @@ body:
     attributes:
       name: executable
       label: 'Command or path to executable (optional):'
-      defaultValue: "bw"
+      defaultValue: ""
       description: Command or path to Bitwarden CLI executable. 
