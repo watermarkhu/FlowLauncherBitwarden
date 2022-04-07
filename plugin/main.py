@@ -10,7 +10,8 @@ from urllib.error import HTTPError as URLError
 
 
 NO_WINDOW = 0x08000000
-TMPDIR = pathlib.Path(tempfile.gettempdir())
+TMPDIR = pathlib.Path(tempfile.gettempdir()) / 'FlowLauncherBitwarden'
+TMPDIR.mkdir(parents=True, exist_ok=True)
 DEFAULT_ICON = pathlib.Path(__file__).parent.parent.absolute() / 'icons' / 'bitwarden256x256.png'
 
 
@@ -26,6 +27,12 @@ class Bitwarden(Flox, Clipboard):
                 parameters=['https://bitwarden.com/help/cli/']
             )
             return self._results
+
+        if self.settings['executable']:
+            path = pathlib.Path(self.settings['executable'].encode('unicode_escape'))
+            command = path if path.exists() else 'bw'
+        else:
+            command = 'bw'
         
         if len(query) > 1:
 
@@ -37,13 +44,13 @@ class Bitwarden(Flox, Clipboard):
             startupinfo.wShowWindow = subprocess.SW_HIDE
 
             if query == 'sync':
-                subprocess.run('bw sync'.split(), env=my_env, startupinfo = startupinfo)
+                subprocess.run([command, 'sync'], env=my_env, startupinfo = startupinfo)
                 self.add_item(
                         title='Sync completed'
                     )
 
             try:
-                output = subprocess.run(f'bw list items --search {query}'.split(), capture_output=True, env=my_env, startupinfo = startupinfo)
+                output = subprocess.run(f'{command} list items --search {query}'.split(), capture_output=True, env=my_env, startupinfo = startupinfo)
                 outputStr = output.stdout.decode('UTF-8')
                 outputDict = json.loads(outputStr);
             except json.JSONDecodeError:
@@ -68,13 +75,13 @@ class Bitwarden(Flox, Clipboard):
                         if len(urls) != 0:
 
                             fileName = ''.join(e for e in item["name"] if e.isalnum())
-                            iconPath = TMPDIR / f'{fileName}.png'
-                            if not os.path.exists(iconPath):
-                                try:
-                                    icon = favicon.get(urls[0])[0]
-                                    urllib.request.urlretrieve(icon.url, iconPath)
-                                except (HTTPError, SSLError, URLError, IndexError,ConnectionError) as e:
-                                    iconPath = DEFAULT_ICON
+                            
+                            try:
+                                icon = [icon for icon in favicon.get(urls[0]) if icon.format in ['png', 'jpg']][-1]
+                                iconPath = TMPDIR / f'{fileName}.{icon.format}'
+                                urllib.request.urlretrieve(icon.url, iconPath)
+                            except (HTTPError, SSLError, URLError, IndexError,ConnectionError) as e:
+                                iconPath = DEFAULT_ICON
                         else:
                             iconPath = DEFAULT_ICON
                                 

@@ -17,3 +17,10 @@ body:
       label: 'Session key:'
       defaultValue: ""
       description: Bitwarden-cli session key
+
+  - type: input
+    attributes:
+      name: executable
+      label: 'Command or path to executable (optional):'
+      defaultValue: "bw"
+      description: Command or path to Bitwarden CLI executable. 
